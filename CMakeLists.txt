@@ -1,0 +1,5 @@
+cmake_minimum_required( VERSION 2.8 )
+project( ObjectTracker )
+find_package( OpenCV REQUIRED )
+add_executable( ObjectTracker window.cpp colored_object.cpp )
+target_link_libraries( ObjectTracker ${OpenCV_LIBS} )
