@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.1 FATAL_ERROR)
 project(ObjectTracker)
 find_package(OpenCV REQUIRED)
-add_executable(ObjectTracker window.cpp colored_object.cpp)
+add_executable(ObjectTracker window.cpp coloredobject.cpp)
 target_link_libraries(ObjectTracker ${OpenCV_LIBS})
 set_property(TARGET ObjectTracker PROPERTY CXX_STANDARD 11)
 set_property(TARGET ObjectTracker PROPERTY CXX_STANDARD_REQUIRED ON)

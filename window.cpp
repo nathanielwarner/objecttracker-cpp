@@ -1,7 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <opencv2/highgui/highgui.hpp>
-#include "colored_object.hpp"
+#include "coloredobject.hpp"
 
 using namespace std;
 using namespace cv;
@@ -15,7 +15,6 @@ void mouseCallback(int event, int x, int y, int flags, void* userdata)
 {
 	if (event == EVENT_LBUTTONDOWN)
 	{
-		cout << "Left button down at " << x << ", " << y << endl;
 		pendingX = x;
 		pendingY = y;
 	}
@@ -51,12 +50,17 @@ int main(int argc, const char** argv)
 		}
 		
 		GaussianBlur(frameBGR, frameBGR, Size(3, 3), 0, 0);
-		cvtColor(frameBGR, frameHSV, COLOR_BGR2HSV);
+		cvtColor(frameBGR, frameHSV, CV_BGR2HSV);
 		for (ColoredObject obj : objects)
 			obj.tick(&frameHSV);
 		
 		if (pendingX != -1)
 		{
+			Vec3b colorBGR = (frameBGR).at<Vec3b>(pendingX, pendingY);
+			Vec3b colorHSV = (frameHSV).at<Vec3b>(pendingX, pendingY);
+			printf("Clicked (%i, %i): B=%i, G=%i, R=%i, H=%i, S=%i, V=%i\n", pendingX, pendingY,
+				colorBGR.val[0], colorBGR.val[1], colorBGR.val[2],
+				colorHSV.val[0], colorHSV.val[1], colorHSV.val[2]);
 			objects.push_back(ColoredObject(pendingX, pendingY, &frameHSV));
 			pendingX = -1;
 			pendingY = -1;
