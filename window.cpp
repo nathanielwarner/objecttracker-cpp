@@ -1,8 +1,25 @@
 #include <iostream>
+#include <vector>
 #include <opencv2/highgui/highgui.hpp>
+#include "colored_object.hpp"
 
-using namespace cv;
 using namespace std;
+using namespace cv;
+
+vector<ColoredObject> objects;
+
+int pendingX = -1;
+int pendingY = -1;
+
+void mouseCallback(int event, int x, int y, int flags, void* userdata)
+{
+	if (event == EVENT_LBUTTONDOWN)
+	{
+		cout << "Left button down at " << x << ", " << y << endl;
+		pendingX = x;
+		pendingY = y;
+	}
+}
 
 int main(int argc, const char** argv)
 {
@@ -19,13 +36,13 @@ int main(int argc, const char** argv)
 	
 	cout << "Frame size: " << dWidth << " x " << dHeight << endl;
 	
-	namedWindow("MyVideo", CV_WINDOW_AUTOSIZE);
+	namedWindow("Camera", CV_WINDOW_AUTOSIZE);
+	setMouseCallback("Camera", mouseCallback, NULL);
 	
+	Mat frameBGR, frameHSV;
 	while (true)
 	{
-		Mat frame;
-		
-		bool bSuccess = cap.read(frame);
+		bool bSuccess = cap.read(frameBGR);
 		
 		if (!bSuccess)
 		{
@@ -33,12 +50,30 @@ int main(int argc, const char** argv)
 			break;
 		}
 		
-		imshow("Webcam", frame);
+		GaussianBlur(frameBGR, frameBGR, Size(3, 3), 0, 0);
+		cvtColor(frameBGR, frameHSV, COLOR_BGR2HSV);
+		for (ColoredObject obj : objects)
+			obj.tick(&frameHSV);
 		
-		if (waitKey(10) == 27)
+		if (pendingX != -1)
+		{
+			objects.push_back(ColoredObject(pendingX, pendingY, &frameHSV));
+			pendingX = -1;
+			pendingY = -1;
+		}
+		
+		imshow("Camera", frameBGR);
+		
+		int x = waitKey(10);
+		if (x == 27)
 		{
 			cout << "esc key is pressed" << endl;
 			break;
+		}
+		else if (char(x) == 'p')
+		{
+			for (ColoredObject obj : objects)
+				obj.print();
 		}
 	}
 	
