@@ -52,7 +52,9 @@ int main(int argc, const char** argv)
 		GaussianBlur(frameBGR, frameBGR, Size(3, 3), 0, 0);
 		cvtColor(frameBGR, frameHSV, CV_BGR2HSV);
 		for (ColoredObject obj : objects)
-			obj.tick(&frameHSV);
+			rectangle(frameBGR, obj.tick(&frameHSV), Scalar(100, 100, 100));
+		
+		imshow("Camera", frameBGR);
 		
 		if (pendingX != -1)
 		{
@@ -65,9 +67,6 @@ int main(int argc, const char** argv)
 			pendingX = -1;
 			pendingY = -1;
 		}
-		
-		imshow("Camera", frameBGR);
-		
 		int x = waitKey(10);
 		if (x == 27)
 		{
