@@ -52,17 +52,19 @@ int main(int argc, const char** argv)
 		GaussianBlur(frameBGR, frameBGR, Size(3, 3), 0, 0);
 		cvtColor(frameBGR, frameHSV, CV_BGR2HSV);
 		for (ColoredObject obj : objects)
-			rectangle(frameBGR, obj.tick(&frameHSV), Scalar(100, 100, 100));
-		
+		{
+			if (obj.tick(&frameHSV))
+			{
+				rectangle(frameBGR, obj.getBoundingRect(), Scalar(0, 0, 255));
+			}
+		}
+			
 		imshow("Camera", frameBGR);
 		
 		if (pendingX != -1)
 		{
 			Vec3b colorBGR = (frameBGR).at<Vec3b>(pendingX, pendingY);
 			Vec3b colorHSV = (frameHSV).at<Vec3b>(pendingX, pendingY);
-			printf("Clicked (%i, %i): B=%i, G=%i, R=%i, H=%i, S=%i, V=%i\n", pendingX, pendingY,
-				colorBGR.val[0], colorBGR.val[1], colorBGR.val[2],
-				colorHSV.val[0], colorHSV.val[1], colorHSV.val[2]);
 			objects.push_back(ColoredObject(pendingX, pendingY, &frameHSV));
 			pendingX = -1;
 			pendingY = -1;
@@ -75,6 +77,7 @@ int main(int argc, const char** argv)
 		}
 		else if (char(x) == 'p')
 		{
+			printf("----Printing all objects----\n");
 			for (ColoredObject obj : objects)
 				obj.print();
 		}

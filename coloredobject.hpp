@@ -11,17 +11,21 @@ class ColoredObject
 {
 	
 public:
-	ColoredObject(double x, double y, Mat* frameHSV); // Construct object from coordinates
-	Rect tick(Mat* frameHSV); // Call once per frame to update location; returns bounding rectangle around object
+	ColoredObject(double x, double y, Mat* frameHSV, int hTol=10, int sTol=20, int vTol=20); // Construct object from coordinates. Optionally specify HSV tolerances
+	bool tick(Mat* frameHSV); // Call once per frame to update location. Returns whether the object was found in the image
+	Rect getBoundingRect();
 	void print(void); // 
 	
 private:
-	const array<int,3> hsvTol = {5, 10, 10};
 	array<int,2> loc; // Location
-	array<int,3> color; // Color
+	int dx, ddx, dddx; // Speed, acceleration, and change in acceleration
+	Rect br; // Bounding rectangle
+	array<int,3> color;
+	array<int,3> hsvTol;
 	array<int,3> lowerBound;
 	array<int,3> upperBound;
-	int dx, ddx, dddx; // Speed, acceleration, and change in acceleration
+	
 	void calcTolerances(void);
+	int chooseContour(vector<vector<Point>>* contours);
 	
 };
