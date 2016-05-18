@@ -53,7 +53,7 @@ int main(int argc, const char** argv)
 		cvtColor(frameBGR, frameHSV, CV_BGR2HSV);
 		for (ColoredObject obj : objects)
 		{
-			if (obj.tick(&frameHSV))
+			if (obj.tick())
 			{
 				rectangle(frameBGR, obj.getBoundingRect(), Scalar(0, 0, 255));
 			}
