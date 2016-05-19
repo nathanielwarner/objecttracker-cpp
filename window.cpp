@@ -11,6 +11,8 @@ vector<ColoredObject> objects;
 int pendingX = -1;
 int pendingY = -1;
 
+int pendingID = 0;
+
 void mouseCallback(int event, int x, int y, int flags, void* userdata)
 {
 	if (event == EVENT_LBUTTONDOWN)
@@ -51,21 +53,23 @@ int main(int argc, const char** argv)
 		
 		GaussianBlur(frameBGR, frameBGR, Size(3, 3), 0, 0);
 		cvtColor(frameBGR, frameHSV, CV_BGR2HSV);
-		for (ColoredObject obj : objects)
+		for (int i=0; i<objects.size(); i++)
 		{
-			if (obj.tick())
+			if (objects.at(i).tick())
 			{
-				rectangle(frameBGR, obj.getBoundingRect(), Scalar(0, 0, 255));
+				rectangle(frameBGR, objects.at(i).getBoundingRect(), Scalar(0, 0, 255));
+				//objects.at(i).print();
 			}
 		}
-			
+		
 		imshow("Camera", frameBGR);
 		
 		if (pendingX != -1)
 		{
 			Vec3b colorBGR = (frameBGR).at<Vec3b>(pendingX, pendingY);
 			Vec3b colorHSV = (frameHSV).at<Vec3b>(pendingX, pendingY);
-			objects.push_back(ColoredObject(pendingX, pendingY, &frameHSV));
+			objects.push_back(ColoredObject(pendingID, pendingX, pendingY, &frameHSV));
+			pendingID++;
 			pendingX = -1;
 			pendingY = -1;
 		}
@@ -78,10 +82,14 @@ int main(int argc, const char** argv)
 		else if (char(x) == 'p')
 		{
 			printf("----Printing all objects----\n");
-			for (ColoredObject obj : objects)
-				obj.print();
+			for (int i=0; i<objects.size(); i++)
+				objects.at(i).print();
 		}
 	}
 	
+	for (int i=0; i<objects.size(); i++)
+	{
+		objects.at(i).terminate();
+	}
 	return 0;
 }
