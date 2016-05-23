@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <opencv2/highgui/highgui.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
 #include "coloredobject.hpp"
 
 using namespace std;
@@ -12,6 +13,8 @@ int pendingX = -1;
 int pendingY = -1;
 
 int pendingID = 0;
+
+boost::posix_time::ptime t;
 
 void mouseCallback(int event, int x, int y, int flags, void* userdata)
 {
@@ -41,6 +44,8 @@ int main(int argc, const char** argv)
 	setMouseCallback("Camera", mouseCallback, NULL);
 	
 	Mat frameBGR, frameHSV;
+	
+	t = boost::posix_time::microsec_clock::local_time();
 	while (true)
 	{
 		bool bSuccess = cap.read(frameBGR);
@@ -62,6 +67,14 @@ int main(int argc, const char** argv)
 			}
 		}
 		
+		boost::posix_time::ptime ct = boost::posix_time::microsec_clock::local_time();
+		boost::posix_time::time_duration diff = ct - t;
+		long delta = diff.total_milliseconds();
+		
+		double fps = 1000.0 / delta;
+		string message = to_string(fps) + " fps";
+		putText(frameBGR, message, Point(35, 35), FONT_HERSHEY_SIMPLEX, 0.5, CV_RGB(255, 0, 0));
+		t = ct;
 		imshow("Camera", frameBGR);
 		
 		if (pendingX != -1)
@@ -73,7 +86,7 @@ int main(int argc, const char** argv)
 			pendingX = -1;
 			pendingY = -1;
 		}
-		int x = waitKey(10);
+		int x = waitKey(1);
 		if (x == 27)
 		{
 			cout << "esc key is pressed" << endl;
