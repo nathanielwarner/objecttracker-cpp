@@ -39,6 +39,10 @@ int main(int argc, const char** argv)
 	double dHeight = cap.get(CV_CAP_PROP_FRAME_HEIGHT);
 	
 	cout << "Frame size: " << dWidth << " x " << dHeight << endl;
+	ofstream file;
+	file.open("cam_size");
+	file << dWidth << " " << dHeight << endl;
+	file.close();
 	
 	namedWindow("Camera", CV_WINDOW_AUTOSIZE);
 	setMouseCallback("Camera", mouseCallback, NULL);
@@ -104,5 +108,6 @@ int main(int argc, const char** argv)
 	{
 		objects.at(i).terminate();
 	}
+	system("rm cam_size");
 	return 0;
 }
